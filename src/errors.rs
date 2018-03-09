@@ -1,5 +1,4 @@
 use failure::{Error, SyncFailure};
-use super::std::{self, fmt};
 
 pub type RustyNzbResult<T> = Result<T, Error>;
 

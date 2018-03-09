@@ -8,10 +8,16 @@ pub mod errors;
 use errors::{RustyNzbResult, ResultExt};
 
 use std::io::BufRead;
-use std::borrow::Cow;
 
 use quick_xml::reader::Reader;
 use quick_xml::events::Event;
+
+macro_rules! give_some {
+    ($to_replace:expr, $replacement:expr) => {
+        ::std::mem::replace($to_replace, Some($replacement));
+    };
+}
+
 
 #[derive(Debug)]
 pub struct Segment {
@@ -56,7 +62,7 @@ pub struct NzbFileBuilder {
 impl NzbFileBuilder {
     pub fn set_filename<T>(&mut self, filename: T) -> &mut Self
         where T: Into<String> {
-        std::mem::replace(&mut self.filename, Some(filename.into()));
+        give_some!(&mut self.filename, filename.into());
         self
     }
 
@@ -119,21 +125,21 @@ pub fn parse_nzb(file: &mut BufRead) -> RustyNzbResult<Vec<NzbFile>> {
                                     let bytes = attr.unescaped_value().sync()?;
                                     let bytes = String::from_utf8_lossy(&bytes);
                                     if let Ok(bytes) = bytes.parse::<u32>() {
-                                        std::mem::replace(&mut seg_bytes, Some(bytes));
+                                        give_some!(&mut seg_bytes, bytes);
                                     }
                                 }
                                 b"number" => {
                                     let number = attr.unescaped_value().sync()?;
                                     let number = String::from_utf8_lossy(&number);
                                     if let Ok(number) = number.parse::<u32>() {
-                                        std::mem::replace(&mut seg_number, Some(number));
+                                        give_some!(&mut seg_number, number);
                                     }
                                 }
                                 _ => {}
                             }
                         }
                         if let Ok(article_id) = e.unescape_and_decode(&reader) {
-                            std::mem::replace(&mut seg_article_id, Some(article_id));
+                            give_some!(&mut seg_article_id, article_id);
                         }
 
                         match (seg_bytes, seg_number, seg_article_id) {

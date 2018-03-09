@@ -1,5 +1,5 @@
 [package]
-name = "RustyNzb"
+name = "rustynzb"
 version = "0.1.0"
 authors = ["tbess <tdbgamer@gmail.com>"]
 
