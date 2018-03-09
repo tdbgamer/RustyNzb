@@ -1,0 +1,2 @@
+# RustyNzb
+Rust NZB Downloader
