@@ -54,13 +54,15 @@ pub struct NzbFileBuilder {
 }
 
 impl NzbFileBuilder {
-    pub fn set_filename<T>(&mut self, filename: T)
+    pub fn set_filename<T>(&mut self, filename: T) -> &mut Self
         where T: Into<String> {
         std::mem::replace(&mut self.filename, Some(filename.into()));
+        self
     }
 
-    pub fn add_segment(&mut self, segment: Segment) {
+    pub fn add_segment(&mut self, segment: Segment) -> &mut Self {
         self.segments.push(segment.into());
+        self
     }
 
     pub fn clear(&mut self) {
