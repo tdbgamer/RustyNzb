@@ -12,9 +12,11 @@ pub fn parse_nzb(file: &mut BufRead) -> RustyNzbResult<Vec<NzbFile>> {
     let mut nzb_builder = NzbFileBuilder::default();
     let mut segment_builder = SegmentBuilder::default();
     let mut files = Vec::new();
+    let mut in_group = false;
     loop {
         match reader.read_event(&mut buf) {
             Ok(Event::Start(ref e)) => {
+                debug!("Start tag: {}", &String::from_utf8_lossy(e.name()));
                 match e.name() {
                     b"file" => {
                         for attr in e.attributes() {
@@ -56,22 +58,34 @@ pub fn parse_nzb(file: &mut BufRead) -> RustyNzbResult<Vec<NzbFile>> {
                             }
                         }
                     }
+                    b"group" => {
+                        in_group = true;
+                    }
                     _ => {}
                 }
             }
             Ok(Event::Text(ref e)) => {
+                debug!("Text: {}", &String::from_utf8_lossy(&e.unescaped().sync()?));
                 if !segment_builder.is_empty() {
+                    debug!("Setting segment article id");
                     let article_id = e.unescaped().sync()?;
                     segment_builder.set_article_id(String::from_utf8_lossy(&article_id));
+                } else if in_group {
+                    debug!("Adding group");
+                    nzb_builder.add_group(String::from_utf8_lossy(&e.unescaped().sync()?));
                 }
             }
             Ok(Event::End(ref e)) => {
+                debug!("End Tag: {}", &String::from_utf8_lossy(e.name()));
                 match e.name() {
                     b"file" => {
                         files.push(nzb_builder.create()?);
                     }
                     b"segment" => {
                         nzb_builder.add_segment(segment_builder.create()?);
+                    }
+                    b"group" => {
+                        in_group = false;
                     }
                     _ => {}
                 }

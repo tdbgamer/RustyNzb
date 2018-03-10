@@ -10,34 +10,34 @@ macro_rules! give_some {
 
 #[derive(Debug)]
 pub struct Segment {
-    bytes: u32,
-    number: u32,
-    article_id: String,
+    pub bytes: u32,
+    pub number: u32,
+    pub article_id: String,
 }
 
 impl Segment {
-    pub fn new<T>(bytes: u32, number: u32, article_id: T) -> Self
-        where T: Into<String> {
+    pub fn new(bytes: u32, number: u32, article_id: String) -> Self {
         Segment {
             bytes,
             number,
-            article_id: article_id.into(),
+            article_id: article_id,
         }
     }
 }
 
 #[derive(Debug)]
 pub struct NzbFile {
-    filename: String,
-    segments: Vec<Segment>,
+    pub filename: String,
+    pub segments: Vec<Segment>,
+    pub groups: Vec<String>,
 }
 
 impl NzbFile {
-    pub fn new<T>(filename: T, segments: Vec<Segment>) -> Self
-        where T: Into<String> {
+    pub fn new(filename: String, groups: Vec<String>, segments: Vec<Segment>) -> Self {
         NzbFile {
-            filename: filename.into(),
+            filename: filename,
             segments: segments,
+            groups: groups
         }
     }
 }
@@ -46,12 +46,19 @@ impl NzbFile {
 pub struct NzbFileBuilder {
     filename: Option<String>,
     segments: Vec<Segment>,
+    groups: Vec<String>,
 }
 
 impl NzbFileBuilder {
     pub fn set_filename<T>(&mut self, filename: T) -> &mut Self
         where T: Into<String> {
         give_some!(&mut self.filename, filename.into());
+        self
+    }
+
+    pub fn add_group<T>(&mut self, group: T) -> &mut Self
+        where T: Into<String> {
+        self.groups.push(group.into());
         self
     }
 
@@ -62,17 +69,23 @@ impl NzbFileBuilder {
 
     pub fn clear(&mut self) {
         self.filename = None;
+        self.groups.clear();
         self.segments.clear();
     }
 
     pub fn create(&mut self) -> RustyNzbResult<NzbFile> {
         if self.filename.is_none() {
-            bail!("NzbFileBuild requires a filename to be set.");
+            bail!("NzbFileBuilder requires a filename to be set.");
+        }
+        if self.groups.is_empty() {
+            bail!("NzbFileBuilder requires a group to be set.");
         }
         let mut old_segments = Vec::new();
+        let mut old_groups = Vec::new();
         std::mem::swap(&mut old_segments, &mut self.segments);
+        std::mem::swap(&mut old_groups, &mut self.groups);
         Ok(NzbFile::new(self.filename.take().unwrap(),
-                        old_segments))
+                        old_groups, old_segments))
     }
 }
 

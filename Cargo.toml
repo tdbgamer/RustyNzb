@@ -10,5 +10,6 @@ path = "src/lib.rs"
 [dependencies]
 quick-xml = "0.10.0"
 failure = "0.1.1"
-log = "0.4.1"
+log = { version = "0.4.1", features = ["max_level_debug", "release_max_level_warn"] }
 env_logger = "0.5.5"
+nntp = { version = "0.0.7", git = 'https://github.com/tdbgamer/rust-nntp' }
