@@ -3,7 +3,7 @@ extern crate rustynzb;
 use std::fs::File;
 use std::io::BufReader;
 
-use rustynzb::parse_nzb;
+use rustynzb::parser::parse_nzb;
 
 fn main() {
     let filename = std::env::args().nth(1).unwrap();
