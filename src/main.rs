@@ -26,7 +26,6 @@ fn main() {
     env_logger::init();
 
     let mut usenet = NNTPStream::connect(("us.bintube.com", 443)).unwrap();
-    usenet.login("tdbgamer1", "***REMOVED***").unwrap();
     let filename = std::env::args().nth(1).unwrap();
     let file = match File::open(filename) {
         Ok(file) => file,
