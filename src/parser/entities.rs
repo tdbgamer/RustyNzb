@@ -10,13 +10,13 @@ macro_rules! give_some {
 
 #[derive(Debug)]
 pub struct Segment {
-    pub bytes: u32,
+    pub bytes: usize,
     pub number: u32,
     pub article_id: String,
 }
 
 impl Segment {
-    pub fn new(bytes: u32, number: u32, article_id: String) -> Self {
+    pub fn new(bytes: usize, number: u32, article_id: String) -> Self {
         Segment {
             bytes,
             number,
@@ -91,13 +91,13 @@ impl NzbFileBuilder {
 
 #[derive(Default)]
 pub struct SegmentBuilder {
-    bytes: Option<u32>,
+    bytes: Option<usize>,
     number: Option<u32>,
     article_id: Option<String>,
 }
 
 impl SegmentBuilder {
-    pub fn set_bytes(&mut self, bytes: u32) -> &mut Self {
+    pub fn set_bytes(&mut self, bytes: usize) -> &mut Self {
         give_some!(&mut self.bytes, bytes);
         self
     }

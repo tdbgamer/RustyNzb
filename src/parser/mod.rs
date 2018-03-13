@@ -43,7 +43,7 @@ pub fn parse_nzb(file: &mut BufRead) -> RustyNzbResult<Vec<NzbFile>> {
                                 b"bytes" => {
                                     let bytes = attr.unescaped_value().sync()?;
                                     let bytes = String::from_utf8_lossy(&bytes);
-                                    if let Ok(bytes) = bytes.parse::<u32>() {
+                                    if let Ok(bytes) = bytes.parse::<usize>() {
                                         segment_builder.set_bytes(bytes);
                                     }
                                 }
